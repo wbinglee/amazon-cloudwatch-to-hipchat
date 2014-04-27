@@ -4,8 +4,12 @@
 exports.index = function(req, res){
     var request = require('request');
 
-    var sns = JSON.parse(req.text);
     console.log(req.text);
+    var sns = JSON.parse(req.text);
+
+    var roomid = req.params.roomid
+    
+    var hipchatFrom = "Amazon+SNS"
 
     // Is this a subscribe message?
     if (sns.Type == 'SubscriptionConfirmation') {
@@ -23,13 +27,13 @@ exports.index = function(req, res){
         if (sns.Subject === undefined) {
             message = JSON.stringify(sns.Message);
         } else {
-            message = sns.Subject;
+            message = sns.Subject + '\n' + sns.Message;
         }
 
         var hipchatUrl = 'https://api.hipchat.com/v1/rooms/message?' +
                     'auth_token=' + process.env.HIPCHAT_API_TOKEN + '&' +
-                    'room_id=' + process.env.HIPCHAT_ROOM_ID + '&' +
-                    'from=' + process.env.HIPCHAT_FROM_NAME + '&' +
+                    'room_id=' + roomid + '&' +
+                    'from=' + hipchatFrom + '&' +
                     'message=' + message + '&' +
                     'notify=1&' +
                     'format=json';
